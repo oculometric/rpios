@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "stddef.h": "c",
+        "gpio.h": "c",
+        "util.h": "c"
+    }
+}
