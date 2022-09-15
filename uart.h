@@ -6,6 +6,7 @@
 void uart_init(int);
 void uart_putc(unsigned char);
 unsigned char uart_getc();
+unsigned char uart_hasc();
 void uart_puts(const char*);
 
 void println(char*);

@@ -6,6 +6,7 @@
         "util.h": "c",
         "cstdarg": "c",
         "cstdio": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "uart.h": "c"
     }
 }

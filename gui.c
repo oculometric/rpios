@@ -1,7 +1,9 @@
 #include "gui.h"
 #include "uart.h"
+#include "math.h"
 
 void draw_pixel (FRAMEBUFFER_DATA *fbd, int x, int y, uint32_t col) {
+    if (x < 0 || x >= fbd->virtual_width || y < 0 || y >= fbd->virtual_height) return;
     char *pixelbuf = (char *)(fbd->framebuffer_address);
     uint32_t offset = (x*(fbd->depth/8))+(y*(fbd->pitch));
     pixelbuf[offset] = col & 0xFF;
@@ -16,11 +18,33 @@ void draw_element (FRAMEBUFFER_DATA *fbd, graphics_element* el) {
     case graphics_rectangle:
         for (int y = el->y; y < el->y+el->height; y++) {
             for (int x = el->x; x < el->x+el->width; x++) {
+                if (x < 0 || x >= fbd->virtual_width || y < 0 || y >= fbd->virtual_height) continue;
                 uint32_t offset = (x*(fbd->depth/8))+(y*(fbd->pitch));
                 pixelbuf[offset] = el->colour & 0xFF;
                 pixelbuf[offset+1] = (el->colour >> 8) & 0xFF;
                 pixelbuf[offset+2] = (el->colour >> 16) & 0xFF;
             }
+        }
+        break;
+    case graphics_circle:
+        int ar = el->width/2;
+        int br = el->height/2;
+        int a = el->x+(ar);
+        int b = el->y+(br);
+        float theta = 0;
+        float step = 0.5/br;
+        while (theta < MATH_PI) {
+            int xp = a+(ar*cos(theta*2));
+            int xn = (2*a)-xp;
+            int y = b-(br*sin(theta*2));
+            for (int x = xn; x <= xp; x++) {
+                if (x < 0 || x >= fbd->virtual_width || y < 0 || y >= fbd->virtual_height) continue;
+                uint32_t offset = (x*(fbd->depth/8))+(y*(fbd->pitch));
+                pixelbuf[offset] = el->colour & 0xFF;
+                pixelbuf[offset+1] = (el->colour >> 8) & 0xFF;
+                pixelbuf[offset+2] = (el->colour >> 16) & 0xFF;
+            }
+            theta += step;
         }
         break;
     
@@ -55,7 +79,6 @@ void draw_gui (FRAMEBUFFER_DATA* fbd) {
     rect->shape = graphics_rectangle;
     rect->colour = colour_from_rgba(255, 128, 255, 0);
     center_element_at (rect, fbd->virtual_width/2, fbd->virtual_height/2, 400, 400);
-
 
     draw_element (fbd, background);
     draw_element (fbd, rect);

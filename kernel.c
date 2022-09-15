@@ -125,10 +125,25 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     // for (int i = 0; i < 921600; i+=4) {
     //     framebuf_addr[i] = 0xFF;
     // }
+    int a = 0;
+    graphics_element circle[1];
+    circle->shape = graphics_circle;
+    circle->colour = colour_from_rgba(128, 255, 255, 0);
+    center_element_at (circle, buf->virtual_width/2, buf->virtual_height/2, 200, 200);
 
+    
 	while (1) {
-        
+        delay(500);
+        a++;
+        a = a%buf->virtual_width;
+
         draw_gui (buf);
+
+        circle->x = a;
+        draw_element (buf, circle);
+
+
+        if (!uart_hasc()) continue;
 
         unsigned char c = uart_getc();
         if (c == '\r') {
