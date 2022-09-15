@@ -5,6 +5,7 @@
 #include "uart.h"
 #include "util.h"
 #include "mailbox.h"
+#include "gui.h"
 
 #define AARCH64
  
@@ -29,20 +30,6 @@ void execute_cmd (unsigned char* buf) {
 void clear_buf (unsigned char* buf, size_t n) {
     for (size_t i = 0; i <= n; i++) buf[i] = 0x0;
 }
-
-#pragma pack(1)
-typedef struct FRAMEBUFFER {
-    uint32_t physical_width;
-    uint32_t physical_height;
-    uint32_t virtual_width;
-    uint32_t virtual_height;
-    uint32_t pitch;
-    uint32_t depth;
-    uint32_t virtual_x_offset;
-    uint32_t virtual_y_offset;
-    uint32_t framebuffer_address;
-    uint32_t framebuffer_size;
-} FRAMEBUFFER;
 
 
 void dump_memory (void *start, size_t size) {
@@ -71,12 +58,13 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     size_t cmd_buf_p = 0;
 
 
+    // Make a buffer of size 40*4 bytess
     uint32_t FRAMEBUFFER_START[40];
 
     void *head = (void *)FRAMEBUFFER_START;
-    FRAMEBUFFER *buf = (FRAMEBUFFER *)head;
+    FRAMEBUFFER_DATA *buf = (FRAMEBUFFER_DATA *)head;
 
-    *buf = (FRAMEBUFFER){
+    *buf = (FRAMEBUFFER_DATA){
         640,
         480,
         640,
@@ -114,31 +102,34 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     uint32_t *framebuf_addr = (char*)((buf->framebuffer_address) & 0x3FFFFFFF);
 
-    char n = 0xFF;
-    while (1) {
-        n = (n+4) % 0xFF;
+    // char n = 0xFF;
+    // while (1) {
+    //     n = (n+4) % 0xFF;
 
-        for (int y = 0; y < buf->virtual_height; y++) {
-            for (int x = 0; x < buf->virtual_width; x++) {
-                if (x % 4) {
-                    framebuf_addr[((y*buf->virtual_width)+x)*3] = n;
-                }
-                if (x % 3) {
-                    framebuf_addr[(((y*buf->virtual_width)+x)*3) + 1] = n;
-                }
-                if (x % 2) {
-                    framebuf_addr[(((y*buf->virtual_width)+x)*3)+2] = n;
-                }
-            }
-        }
-        delay (200);
-        delay (100);
-    }
+    //     for (int y = 0; y < buf->virtual_height; y++) {
+    //         for (int x = 0; x < buf->virtual_width; x++) {
+    //             if (x % 4) {
+    //                 framebuf_addr[((y*buf->virtual_width)+x)*3] = n;
+    //             }
+    //             if (x % 3) {
+    //                 framebuf_addr[(((y*buf->virtual_width)+x)*3) + 1] = n;
+    //             }
+    //             if (x % 2) {
+    //                 framebuf_addr[(((y*buf->virtual_width)+x)*3)+2] = n;
+    //             }
+    //         }
+    //     }
+    //     delay (200);
+    //     delay (100);
+    // }
     // for (int i = 0; i < 921600; i+=4) {
     //     framebuf_addr[i] = 0xFF;
     // }
 
 	while (1) {
+        
+        draw_gui (buf);
+
         unsigned char c = uart_getc();
         if (c == '\r') {
             uart_putc('\n');
@@ -155,7 +146,4 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
 		uart_putc(c);
     }
-
-
-
 }
