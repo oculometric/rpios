@@ -1,3 +1,7 @@
+rm *.o
+rm kernel8.img
+
+
 aarch64-elf-as -c boot.s -o boot.o
 
 aarch64-elf-gcc -ffreestanding -c kernel.c -o kernel.o -O2 -Wall -Wextra

@@ -3,6 +3,9 @@
 
 #include "mmio.h"
 
+#define MAIL_FULL 0x80000000
+#define MAIL_EMPTY 0x40000000
+
 enum
 {
     // The offsets for reach register.

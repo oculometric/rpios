@@ -4,6 +4,7 @@
 
 #include "uart.h"
 #include "util.h"
+#include "mailbox.h"
 
 #define AARCH64
  
@@ -29,6 +30,28 @@ void clear_buf (unsigned char* buf, size_t n) {
     for (size_t i = 0; i <= n; i++) buf[i] = 0x0;
 }
 
+#pragma pack(1)
+typedef struct FRAMEBUFFER {
+    uint32_t physical_width;
+    uint32_t physical_height;
+    uint32_t virtual_width;
+    uint32_t virutal_height;
+    uint32_t pitch;
+    uint32_t depth;
+    uint32_t virtual_x_offset;
+    uint32_t virtual_y_offset;
+    uint32_t framebuffer_address;
+    uint32_t framebuffer_size;
+} FRAMEBUFFER;
+
+
+void dump_memory (void *start, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        printhex (*(char *)start);
+        newln();
+    }
+}
+
 #ifdef AARCH64
 // arguments for AArch64
 void kernel_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
@@ -40,15 +63,51 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 	// initialize UART for Raspi3
 	uart_init(3);
 	uart_puts("Hello, kernel World!\r\n");
-    if (strcmp ("abcde", "abcde")) uart_puts ("test1\r\n");
-    if (strcmp ("abcde", "abc")) uart_puts ("test2\r\n");
-    if (strcmp ("abcde", "edcba")) uart_puts ("test3\r\n");
- 
+
     unsigned char cmd_buf[65];
     for (uint8_t i = 0; i < 65; i++) {
         cmd_buf[i] = 0x0;
     }
     size_t cmd_buf_p = 0;
+
+
+    uint32_t FRAMEBUFFER_START = 0x0001000;
+
+    void *head = (void *)FRAMEBUFFER_START;
+    FRAMEBUFFER *buf = (FRAMEBUFFER *)head;
+
+    *buf = (FRAMEBUFFER){
+        640,
+        480,
+        640,
+        480,
+        0,
+        24,
+        0,
+        0,
+        0,
+        0
+    };
+
+    mailbox_write (1, (FRAMEBUFFER_START >> 4));
+
+    println ("mailbox written");
+
+    uint32_t result = mailbox_read ();
+
+    println ("mailbox read");
+
+    printhex (result);
+    newln();
+    printhex (buf->framebuffer_address);
+    newln();
+    printint (buf->framebuffer_size);
+    newln();
+
+    // TODO: Write to framebuffer
+    for (int i = 0; i < 1024; i++) {
+        ((char *)(buf->framebuffer_address))[i] = 0xFF;
+    }
 
 	while (1) {
         unsigned char c = uart_getc();
@@ -67,5 +126,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
 		uart_putc(c);
     }
+
+
 
 }

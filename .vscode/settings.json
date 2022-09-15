@@ -3,6 +3,9 @@
         "stdint.h": "c",
         "stddef.h": "c",
         "gpio.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "cstdarg": "c",
+        "cstdio": "c",
+        "cstdint": "c"
     }
 }
