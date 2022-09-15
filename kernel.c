@@ -35,7 +35,7 @@ typedef struct FRAMEBUFFER {
     uint32_t physical_width;
     uint32_t physical_height;
     uint32_t virtual_width;
-    uint32_t virutal_height;
+    uint32_t virtual_height;
     uint32_t pitch;
     uint32_t depth;
     uint32_t virtual_x_offset;
@@ -71,7 +71,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     size_t cmd_buf_p = 0;
 
 
-    uint32_t FRAMEBUFFER_START = 0x0001000;
+    uint32_t FRAMEBUFFER_START[40];
 
     void *head = (void *)FRAMEBUFFER_START;
     FRAMEBUFFER *buf = (FRAMEBUFFER *)head;
@@ -89,7 +89,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
         0
     };
 
-    mailbox_write (1, (FRAMEBUFFER_START >> 4));
+    mailbox_write (MBOX_CH_FRAMEBUFFER, ((uint32_t)FRAMEBUFFER_START >> 4));
 
     println ("mailbox written");
 
@@ -103,11 +103,33 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     newln();
     printint (buf->framebuffer_size);
     newln();
+    printint (buf->physical_width);
+    newln();
+    printint (buf->physical_height);
+    newln();
+    printint (buf->pitch);
+    newln();
+    printint (buf->depth);
+    newln();
 
-    // TODO: Write to framebuffer
-    for (int i = 0; i < 1024; i++) {
-        ((char *)(buf->framebuffer_address))[i] = 0xFF;
+    uint32_t *framebuf_addr = (char*)((buf->framebuffer_address) & 0x3FFFFFFF);
+
+    for (int y = 0; y < buf->virtual_height; y++) {
+        for (int x = 0; x < buf->virtual_width; x++) {
+            if (x % 4) {
+                framebuf_addr[((y*buf->virtual_width)+x)*3] = 0xFF;
+            }
+            if (x % 3) {
+                framebuf_addr[(((y*buf->virtual_width)+x)*3) + 1] = 0xFF;
+            }
+            if (x % 2) {
+                framebuf_addr[(((y*buf->virtual_width)+x)*3)+2] = 0xFF;
+            }
+        }
     }
+    // for (int i = 0; i < 921600; i+=4) {
+    //     framebuf_addr[i] = 0xFF;
+    // }
 
 	while (1) {
         unsigned char c = uart_getc();

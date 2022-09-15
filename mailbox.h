@@ -5,6 +5,18 @@
 #include "gpio.h"
 #include "mmio.h"
 
+enum {
+    MBOX_CH_POWER_MANAGEMENT = 0,
+    MBOX_CH_FRAMEBUFFER = 1,
+    MBOX_CH_VIRTUAL_UART = 2,
+    MBOX_CH_VCHIQ = 3,
+    MBOX_CH_LED = 4,
+    MBOX_CH_BUTTONS = 5,
+    MBOX_CH_TOUCHSCREEN = 6,
+    MBOX_CH_PROPERTY_TAGS_TO_VC = 8,
+    MBOX_CH_PROPERTY_TAGS_FROM_VC = 9
+};
+
 // Write to a mailbox. Channel supply the channel number (max 4 bits), data supply the data, 4-bit correction will be performed within function (max 28 bits data)
 static inline void mailbox_write(uint8_t channel, uint32_t data) {
 	while ((mmio_read(MBOX_STATUS) & MAIL_FULL) != 0) {}
