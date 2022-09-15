@@ -114,18 +114,25 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     uint32_t *framebuf_addr = (char*)((buf->framebuffer_address) & 0x3FFFFFFF);
 
-    for (int y = 0; y < buf->virtual_height; y++) {
-        for (int x = 0; x < buf->virtual_width; x++) {
-            if (x % 4) {
-                framebuf_addr[((y*buf->virtual_width)+x)*3] = 0xFF;
-            }
-            if (x % 3) {
-                framebuf_addr[(((y*buf->virtual_width)+x)*3) + 1] = 0xFF;
-            }
-            if (x % 2) {
-                framebuf_addr[(((y*buf->virtual_width)+x)*3)+2] = 0xFF;
+    char n = 0xFF;
+    while (1) {
+        n = (n+4) % 0xFF;
+
+        for (int y = 0; y < buf->virtual_height; y++) {
+            for (int x = 0; x < buf->virtual_width; x++) {
+                if (x % 4) {
+                    framebuf_addr[((y*buf->virtual_width)+x)*3] = n;
+                }
+                if (x % 3) {
+                    framebuf_addr[(((y*buf->virtual_width)+x)*3) + 1] = n;
+                }
+                if (x % 2) {
+                    framebuf_addr[(((y*buf->virtual_width)+x)*3)+2] = n;
+                }
             }
         }
+        delay (200);
+        delay (100);
     }
     // for (int i = 0; i < 921600; i+=4) {
     //     framebuf_addr[i] = 0xFF;
