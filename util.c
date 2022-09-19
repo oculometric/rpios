@@ -57,9 +57,3 @@ uint8_t inttostr (char* out, int i, unsigned int base) {
     if (digit == blen) return 1;
     return 0;
 }
-
-void fill (char* p, size_t s, char v) {
-    for (size_t i = 0; i < s; i++) {
-        p[i] = v;
-    }
-}

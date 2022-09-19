@@ -27,18 +27,6 @@ void execute_cmd (unsigned char* buf) {
     }
 }
 
-void clear_buf (unsigned char* buf, size_t n) {
-    for (size_t i = 0; i <= n; i++) buf[i] = 0x0;
-}
-
-
-void dump_memory (void *start, size_t size) {
-    for (size_t i = 0; i < size; i++) {
-        printhex (*(char *)start);
-        newln();
-    }
-}
-
 #ifdef AARCH64
 // arguments for AArch64
 void kernel_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
@@ -130,18 +118,19 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     circle->shape = graphics_circle;
     circle->colour = colour_from_rgba(128, 255, 255, 0);
     center_element_at (circle, buf->virtual_width/2, buf->virtual_height/2, 200, 200);
-
+    delay(500);
+    
     
 	while (1) {
-        delay(500);
         a++;
         a = a%buf->virtual_width;
 
         draw_gui (buf);
 
         circle->x = a;
+        draw_gui(buf);
         draw_element (buf, circle);
-
+        flip(buf);
 
         if (!uart_hasc()) continue;
 
@@ -149,7 +138,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
         if (c == '\r') {
             uart_putc('\n');
             execute_cmd (cmd_buf);
-            clear_buf (cmd_buf, cmd_buf_p);
+            fill_mem ((void *)cmd_buf, cmd_buf_p);
             cmd_buf_p = 0;
         } else if (c == '\b' && cmd_buf_p > 0) {
             cmd_buf_p--;

@@ -1,10 +1,11 @@
 #include "gui.h"
 #include "uart.h"
 #include "math.h"
+#include "mem.h"
 
 void draw_pixel (FRAMEBUFFER_DATA *fbd, int x, int y, uint32_t col) {
     if (x < 0 || x >= fbd->virtual_width || y < 0 || y >= fbd->virtual_height) return;
-    char *pixelbuf = (char *)(fbd->framebuffer_address);
+    char *pixelbuf = (char *)(fbd->framebuffer_address + fbd->framebuffer_size);
     uint32_t offset = (x*(fbd->depth/8))+(y*(fbd->pitch));
     pixelbuf[offset] = col & 0xFF;
     pixelbuf[offset+1] = (col >> 8) & 0xFF;
@@ -12,7 +13,7 @@ void draw_pixel (FRAMEBUFFER_DATA *fbd, int x, int y, uint32_t col) {
 }
 
 void draw_element (FRAMEBUFFER_DATA *fbd, graphics_element* el) {
-    char *pixelbuf = (char *)(fbd->framebuffer_address);
+    char *pixelbuf = (char *)(fbd->framebuffer_address + fbd->framebuffer_size);
     switch (el->shape)
     {
     case graphics_rectangle:
@@ -66,7 +67,7 @@ uint32_t colour_from_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-void draw_gui (FRAMEBUFFER_DATA* fbd) {
+void draw_gui(FRAMEBUFFER_DATA* fbd) {
     graphics_element background[1];
     background->shape = graphics_rectangle;
     background->colour = colour_from_rgba(50, 50, 50, 0);
@@ -86,4 +87,8 @@ void draw_gui (FRAMEBUFFER_DATA* fbd) {
     for (int i = 0; i < 500; i++) {
         draw_pixel (fbd, i, i, colour_from_rgba(i%255, 0, 0, 0));
     }
+}
+
+void flip(FRAMEBUFFER_DATA* fbd) {
+    copy_mem (fbd->framebuffer_address + fbd->framebuffer_size, fbd->framebuffer_address, fbd->framebuffer_size);
 }

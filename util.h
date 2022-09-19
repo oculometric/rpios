@@ -13,5 +13,5 @@ static inline void delay(int32_t count)
 uint8_t strcmp (char*, char*);
 size_t strlen (char*);
 uint8_t inttostr (char*, int, unsigned int); // Returns 0 on success, 1 if buffer overflowed
-void fill (char*, size_t, char);
+
 #endif

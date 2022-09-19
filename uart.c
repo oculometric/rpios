@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "util.h"
 #include "mmio.h"
+#include "mem.h"
 
 // A Mailbox message with set clock rate of PL011 to 3MHz tag
 volatile unsigned int  __attribute__((aligned(16))) mbox[9] = {
@@ -102,7 +103,7 @@ void print(char* str) {
 void printhex(unsigned int h) {
 	uart_puts("0x");
 	char buf[33];
-	fill (buf, 32, '0');
+	fill_mem (buf, 32, '0');
 	buf[32] = 0x0;
 	inttostr(buf, h, 16);
 	uart_puts(buf);
@@ -111,7 +112,7 @@ void printhex(unsigned int h) {
 void printbin(unsigned int b) {
 	uart_puts("0b");
 	char buf[65];
-	fill (buf, 64, '0');
+	fill_mem (buf, 64, '0');
 	buf[64] = 0x0;
 	inttostr(buf, b, 2);
 	uart_puts(buf);
@@ -119,7 +120,7 @@ void printbin(unsigned int b) {
 
 void printint(int i) {
 	char buf[65];
-	fill (buf, 64, '0');
+	fill_mem (buf, 64, '0');
 	buf[64] = 0x0;
 	inttostr(buf, i, 10);
 	uart_puts(buf);

@@ -38,5 +38,6 @@ void draw_pixel(FRAMEBUFFER_DATA*, int, int, uint32_t);
 void draw_gui(FRAMEBUFFER_DATA*);
 void center_element_at(graphics_element*, int, int, int, int);
 uint32_t colour_from_rgba(uint8_t, uint8_t, uint8_t, uint8_t);
+void flip(FRAMEBUFFER_DATA*);
 
 #endif
