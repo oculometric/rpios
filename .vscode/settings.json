@@ -8,5 +8,9 @@
         "cstdio": "c",
         "cstdint": "c",
         "uart.h": "c"
+    },
+    
+    "terminal.integrated.env.linux": {
+        "GTK_PATH": ""
     }
 }

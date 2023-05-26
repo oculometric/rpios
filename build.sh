@@ -1,7 +1,10 @@
-rm *.o
-rm kernel8.img
+# Clean
+rm build
+mkdir build
+mkdir build/o
 
-
+# Compile assembly
+for
 aarch64-elf-as -c boot.s -o boot.o
 
 aarch64-elf-gcc -ffreestanding -c kernel.c -o kernel.o -O2 -Wall -Wextra
