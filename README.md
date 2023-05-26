@@ -1,0 +1,8 @@
+here's a funny story. i decided i wanted to try and write a very very basic kernel that would be bootable on a raspberry pi 3. following various guides from the OSDev Wiki, i produced what you see here. tested in qemu: it boots, outputs some stuff to serial logs, talks to the GPU, configures the screen, and draws some shapes. (if you're trying to build it, follow the cross-compiler tutorial and qemu install documented on the OSDev Wiki for raspi3b).
+
+great! i think. it actually works in qemu. as of me writing this, every single time i load this kernel8.img onto an SD card and fire it up in a pi (a pi that was tested with raspbian, and i went through more than one round of ensuring the firmware files were there when loading my kernel), after a few boot attempts with no successful screen output, i inevitably put the SD card back into my PC to find - it's bricked. RAW uninitialized volume. fails a cyclic redundancy check. unable to repair with CHKDSK, unable to format. busted.
+
+i've burned through 3 SD cards already just trying to make minor changes to the kernel or try booting it again - pi boots other stuff fine, just trying to boot my kernel bricks the SD card. i have no idea how this even happens. i guess it would be called 'undefined behaviour'.
+
+coming back to the project after a long break, i updated the build system to use make, tried again to get it running on hardware, but no luck. the code isn't commented (good job past me) but seeing the snippets from OSDev Wiki put into practice could be useful to someone.
+although, don't say i didn't warn you about potential consequences of repeating... whatever obscure curse i've brought upon this repository.
